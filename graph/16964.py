@@ -1,60 +1,45 @@
-from collections import deque, defaultdict
+# 정점의 수 입력 받음
+N = int(input())
 
-# 정점의 수 입력 받기
-vertices = int(input())
+# 그래프의 연결을 포함하는 그래프 생성
+graph = [[] for i in range(N+1)]
 
-# 트리 구조 입력받가
-graphs = [[] for _ in range(vertices+1)]
-for _ in range(vertices-1):
-    one, two = map(int, input().split())
-    graphs[one].append(two)
-    graphs[two].append(one)
+for _ in range(N-1):
+    x, y = map(int, input().split())
+    graph[x].append(y)
+    graph[y].append(x)
 
-# 비교해야 하는 DFS 순서
-final_dfs = list(map(int, input().split()))
+# 그래프의 방문된 노드를 추적하는 세트
+visit_set = []
 
-# 방문여부를 확인하는 함수
-visited = [0] * (vertices + 1)
+# DFS 함수
+def dfs(node):
+    # 조합에 방문한 노드를 집어넣는다.
+    visit_set.append(node)        
+    for neighbour in graph[node]:
+        if neighbour not in visit_set:
+            dfs(neighbour)
 
-# 부모 자식간의 위치를 확인해야 하므로 리스트를 선언함
-relation = defaultdict(list)
+# 확인해야하는 DFS 알고리즘
+check_dfs = list(map(int, input().split()))
 
-# 시작은 무조건 1로 시작해야함
-if final_dfs[0] != 1:
+# 방문 순서
+order = [0] * (N+1)
+
+if check_dfs[0] != 1:
     print(0)
 else:
-    # bfs 함수 이용
-    queue = deque()
-
-    # 1로 시작해야 하므로 선언
-    queue.append(1)
-    visited[1] = 1
-
-    # 큐를 이용해 방문 여부를 확인
-    while queue:
-        node = queue.popleft()
-        for i in graphs[node]:
-            if visited[i] != 0: continue
-            visited[i] = visited[node] + 1
-            relation[node].append(i)
-            queue.append(i)
+    # 방문 순서를 각각 저장
+    for i in range(1, N+1):
+        order[check_dfs[i-1]] = i
     
-    # 주어진 함수와 우리가 검증한 트리와 맞는지 확인
-    q = deque()
-    q.append(1)
-    # 위치
-    position = 1
+    # 방문 순서대로 그래프 정렬
+    for i in range(1, N+1):
+        graph[i] = sorted(graph[i], key=lambda j : order[j])
+    
+    dfs(1)
 
-    while q:
-        test = q.popleft()
-
-        compare = set(relation[test])
-        order = final_dfs[position:position + len(compare)]
-        q.extend(order)
-        position += len(compare)
-
-        if compare != set(order):
-            print(0)
-            break
-    else:
+    if visit_set == check_dfs:
         print(1)
+    else:
+        print(0)
