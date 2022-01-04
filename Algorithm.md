@@ -699,6 +699,47 @@ for i in range(1, v + 1):
     - 사이클을 형성하는 간선을 제외한다.
 3. 해당 간선을 현재의 MST 집합에 추가한다.
 
+#### 구현
+
+```
+import sys
+
+v, e = map(int, input().split())
+parent = [0] * (v+1)
+for i in range(1, v+1):
+    parent[i] = i
+
+def find_parent(parent, x):
+    if parent[x] != x:
+        parent[x] = find_parent(parent, parent[x])
+    return parent[x]
+
+def union_parent(parent, a, b):
+    a = find_parent(parent, a)
+    b = find_parent(parent, b)
+    if a < b:
+        parent[b] = a
+    else:
+        parent[a] = b
+
+edges = []
+total_cost = 0
+
+for _ in range(e):
+    a, b, cost = map(int, input().split())
+    edges.append((cost, a, b))
+
+edges.sort()
+
+for i in range(e):
+    cost, a, b = edges[i]
+    if find_parent(parent, a) != find_parent(parent, b):
+        union_parent(parent, a, b)
+        total_cost += cost
+
+print(total_cost)
+```
+
 ### 3) 프림 (Prim)
 
 > 시작 정점에서부터 출발하여 신장트리 집합을 단계적으로 확장해나가는 방법
@@ -712,6 +753,43 @@ for i in range(1, v + 1):
 #### 구현
 
 - 프림 알고리즘은 다익스트라 알고리즘과 거의 유사하지만 프림 알고리즘은 인접 간선을 추출하여 우선 순위 큐에 삽입할 때, 순환이 발생하면 안되므로 방문한 노드인지 확인을 하고 우선순위 큐에 삽입을 합니다.
+
+```
+import heapq
+import collections
+import sys
+
+sys.setrecursionlimit(10**6)
+
+n, m = map(int, input().split())
+graph = collections.defaultdict(list)
+visited = [0] * (n+1)
+
+for i in range(m):
+    u, v, weight = map(int, input().split())
+    graph[u].append([weight, u, v])
+    graph[v].append([weight, v, u])
+
+def prim(graph, start):
+    visited[start] = 1 # 방문 갱신
+    candidate = graph[start] # 인접 간선 추출
+    heapq.heapify(candidate) # 우선순위 큐 생성
+    mst = []
+    total_weight = 0
+    
+    while candidate:
+        weight, u, v = heapq.heappop(candidate) # 가중치가 가장 적은 간선 추출
+        if visited[v] == 0:
+            visited[v] = 1
+            mst.append((u, v))
+            total_weight += weight
+            
+            for edge in graph[v]: # 다음 인접 간선 탐색
+                if visited[edge[2]] == 0: # 방문한 노드가 아니라면
+                    heapq.heappush(candidate, edge) # 우선 순위 큐에 edge 삽입
+    return total_weight
+print(prim(graph, 1))
+```
 
 ## 참고 사이트
 
