@@ -791,6 +791,61 @@ def prim(graph, start):
 print(prim(graph, 1))
 ```
 
+## 8. 탐색 알고리즘
+
+### 1) 선형 탐색(Linear Search)
+
+선형 탐색(Linear Search)은 일렬로 된 자료를 왼쪽부터 오른쪽으로 차례대로 탐색하는 것을 말합니다.
+
+```
+def linear_search(element, arr):
+    for i in range(arr):
+        if i == element:
+            return i
+        else:
+            continue
+    return None
+```
+
+### 2) 이진 탐색 알고리즘(Binary Search)
+
+이진 탐색이란 데이터가 정렬되어 있는 배열에서 특정한 값을 찾아내는 알고리즘으로 배열의 중간에 있는 임의의 값을 선택하여 찾고자 하는 값 X와 비교한다. **X가 중간 값보다 작으면 중간 값을 기준으로 좌측의 데이터들을 대상으로, X가 중간값보다 크면 배열의 우측을 대상으로 다시 탐색**한다. 동일한 방법으로 다시 중간의 값을 임의로 선택하고 비교한다. 해당 값을 찾을때까지 이 과정을 반복한다.
+
+#### 반복문을 이용한 방법
+
+```
+def BSearch(arr, target):
+    low, high = 0, len(arr)-1
+    mid = 0
+    
+    while low <= high:
+        mid = (low + high) // 2
+        
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] > target:
+            high = mid - 1
+        else:
+            low = mid + 1
+    return -1
+```
+
+#### 재귀함수를 이용한 방법
+
+```
+def BSearch(arr, target, low, high):
+    if low > high:
+        return -1
+    mid = (low + high) // 2
+    
+    if arr[mid] == target:
+        return mid
+    elif arr[mid] > target:
+        return BSearch(arr, target, low, mid-1)
+    else:
+        return BSearch(arr, target, mid+1, high)
+```
+
 ## 참고 사이트
 
 - 정렬 알고리즘 모든 것 : https://namu.wiki/w/%EC%A0%95%EB%A0%AC%20%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98
@@ -810,3 +865,4 @@ print(prim(graph, 1))
 - Union-Find : https://velog.io/@woo0_hooo/%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98-union-find-%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98
 - 크루스칼 알고리즘 : https://gmlwjd9405.github.io/2018/08/29/algorithm-kruskal-mst.html
 - 프림 알고리즘 : https://gmlwjd9405.github.io/2018/08/30/algorithm-prim-mst.html
+- 이진 탐색 : https://cjh5414.github.io/binary-search/
