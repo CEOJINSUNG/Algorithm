@@ -489,7 +489,7 @@ def dijkstra(graph, start):
             continue
         
         for new_destination, new_distance in graph[current_destination].items():
-            distance = current_distance + new_distance
+            distance = distances[current_destination] + new_distance
             if distance < distances[new_destination]:
                 distances[new_destination] = distance
                 heapq.heappush(queue, [distance, new_destination])
