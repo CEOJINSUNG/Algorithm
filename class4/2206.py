@@ -1,25 +1,35 @@
-from collections import deque
 import sys
 input = sys.stdin.readline
-
-N, M = map(int, input().split())
-matrix = [list(map(int, input().split())) for _ in range(N)]
-visited = [[False] * M for _ in range(N)]
 
 dx = [0, 0, -1, 1]
 dy = [-1, 1, 0, 0]
 
-def bfs(x, y):
-    q = deque()
-    q.append((x, y))
+N, M = map(int, input().split())
+wall = [list(map(int, input().rstrip())) for _ in range(N)]
+
+def bfs():
+    q = []
+    q.append((0, 0, 1))
+    visited = [[[0]*2 for _ in range(M)] for _ in range(N)]
+    visited[0][0][1] = 1
 
     while q:
-        x_, y_ = q.popleft()
+        x, y, w = q.pop(0)
+        if x == N-1 and y == M-1:
+            return visited[x][y][w]
         
         for i in range(4):
-            new_x = x_ + dx[i]
-            new_y = y_ + dy[i]
+            new_x = x + dx[i]
+            new_y = y + dy[i]
 
-            if 0 <= new_x < M and 0 <= new_y < N and matrix[new_y][new_x] == 0 and visited[new_y][new_x]:
-                q.append((new_x, new_y))
-                visited[new_y][new_x] = True
+            if 0 <= new_x < N and 0 <= new_y < M:
+                if wall[new_x][new_y] == 1 and w == 1:
+                    visited[new_x][new_y][0] = visited[x][y][1] + 1
+                    q.append((new_x, new_y, 0))
+                elif wall[new_x][new_y] == 0 and visited[new_x][new_y][w] == 0:
+                    visited[new_x][new_y][w] = visited[x][y][w] + 1
+                    q.append((new_x, new_y, w))
+    
+    return -1
+
+print(bfs())
