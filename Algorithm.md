@@ -581,7 +581,7 @@ retsult = Floyd_Warshall(n, data)
 ### 예시) 최장 공통 부분 수열(LCS)
 
 ```
-lcs = [[0 for _ in range(len(A) + 1)] for _ in range(len(B) + 1)]
+lcs = [[0 for _ in range(len(B) + 1)] for _ in range(len(A) + 1)]
 
 for i in range(1, len(A) + 1):
     for j in range(1, len(B) + 1):
