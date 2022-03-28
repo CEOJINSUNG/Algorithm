@@ -1,8 +1,6 @@
 from collections import defaultdict
-import sys
-input = sys.stdin.readline
 
-# 세로, 가로 입력
+# n, m input
 n, m = map(int, input().split())
 
 # sea, land
@@ -25,7 +23,6 @@ dy = [1, -1, 0, 0]
 
 for i in range(n):
     for j in range(m):
-        print(i, j)
         if visited[i][j] == False and land[i][j] == 1:
             visited[i][j] = True
             q = []
@@ -78,7 +75,7 @@ for i in range(island_number):
 
         edges.append((min_distance, i, j))        
 
-# Using Kruskal Algorithm, find the minimum spanning tree
+# Using mst Algorithm, find the minimum spanning tree
 node = [i for i in range(island_number)]
 parent = [i for i in range(island_number)]
 
@@ -107,7 +104,7 @@ for edge in edges:
         union(x, y)
         answer += weight
 
-if answer > 100:
+if answer >= 100:
     print(-1)
 else:
     print(answer)
