@@ -72,11 +72,9 @@ for i in range(island_number):
                     elif distance <= min_distance and distance > 1:
                         min_distance = distance
 
-
         edges.append((min_distance, i, j))        
 
 # Using mst Algorithm, find the minimum spanning tree
-node = [i for i in range(island_number)]
 parent = [i for i in range(island_number)]
 
 answer = 0
