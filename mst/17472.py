@@ -1,10 +1,8 @@
-from collections import defaultdict, deque
+from collections import defaultdict
 import sys
-
-from numpy import append
 input = sys.stdin.readline
 
-# 가로, 세로 입력
+# 세로, 가로 입력
 n, m = map(int, input().split())
 
 # sea, land
@@ -39,19 +37,17 @@ for i in range(n):
             while q:
                 x_, y_ = q.pop(0)
 
-                for i in range(4):
-                    new_x = x_ + dx[i]
-                    new_y = y_ + dy[i]
+                for k in range(4):
+                    new_x = x_ + dx[k]
+                    new_y = y_ + dy[k]
 
-                    if (0 <= new_x < n) and (0 <= new_y < m) and visited[new_x][new_y] == False and land[new_x][new_y] == 1:
+                    if 0 <= new_x < n and 0 <= new_y < m and visited[new_x][new_y] == False and land[new_x][new_y] == 1:
                         visited[new_x][new_y] = True
                         q.append((new_x, new_y))
                         chunk.append((new_x, new_y))
                 
             island[island_number] = chunk
             island_number += 1
-
-print(island)
 
 # Using Brute force, find the distance of two islands
 edges = []
