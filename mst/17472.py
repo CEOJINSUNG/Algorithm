@@ -7,8 +7,7 @@ n, m = map(int, input().split())
 land = []
 
 for _ in range(n):
-    one = list(map(int, input().split()))
-    land.append(one)
+    land.append(list(map(int, input().split())))
 
 # for bfs algorithm
 visited = [[False] * m for _ in range(n)]
