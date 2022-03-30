@@ -1,10 +1,24 @@
-from collections import deque
-import copy
-
 n, m = map(int, input().split())
 
-a_board = [list(input()) for _ in range(n)]
-b_board = copy.deepcopy(a_board)
+board = []
+r = (0, 0)
+b = (0, 0)
+o = (0, 0)
+
+for i in range(n):
+    row = list(input())
+    board.append(row)
+
+    if 'R' in row:
+        r = (row.index('R'), i)
+    
+    if 'B' in row:
+        b = (row.index('B'), i)
+    
+    if 'O' in row:
+        o = (row.index('O'), i)
+
+print(r, b, o)
 
 # arrow will include up: 0, down: 1, right: 2, left: 3
 arrow = []
@@ -61,11 +75,6 @@ def bfs(x, y, graph):
     
     return -1
 
-for i in range(n):
-    for j in range(m):
-        if a_board[i][j] == "R":
-            print(bfs(j, i, a_board))
-        # if b_board[i][j] == "B":
-        #     print(bfs(j, i, b_board))
+print(bfs(r[0], r[1], board))
 
 print(arrow)
