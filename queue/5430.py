@@ -1,36 +1,30 @@
-from collections import deque
-import sys
-input = sys.stdin.readline
+T = int(input())
 
-# test means the number of test cases
-test = int(input())
-
-for _ in range(test):
-    # command sequential
-    command = list(input())
-
-    # n means a length of array
+for i in range(T):
+    p = input()
     n = int(input())
 
-    # when array input only add integer
-    array = deque(input()[1:-2].split(','))
+    de = input()[1:-1].split(',')
+    p = p.replace('RR', '')
 
-    # if error happens, stop the command
-    error = False
+    r, f, b = 0, 0, 0
 
-    # reverse means initial position of queue
-    reverse = 0
-
-    for i in command:
-        if i == 'R':
-            array.reverse()
-        else:
-            if array:
-                array.popleft()
+    for j in p:
+        if j == 'R':
+            r+=1
+        elif j == 'D':
+            if r%2 == 0:
+                f += 1
             else:
-                print("error")
-                error = True
-                break
+                b += 1
     
-    if error == False:
-        print("[" + ",".join(array) + "]")
+    if f + b <= n:
+        de = de[f:n-b]
+
+        if r%2 == 1:
+            print('['+','.join(de[::-1]) + ']')
+        else:
+            print('[' + ','.join(de) + ']')
+    
+    else:
+        print('error')
