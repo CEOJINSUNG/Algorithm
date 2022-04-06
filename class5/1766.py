@@ -1,17 +1,35 @@
 import heapq
 
-N, M = map(int, input().split())
+n, m = map(int, input().split())
 
-heap = []
+indegree = [0 for _ in range(n+1)]
+graph = [[] for _ in range(n+1)]
 
-for _ in range(M):
+for _ in range(m):
     a, b = map(int, input().split())
-    heapq.heappush(heap, (a, [a, b]))
+    graph[a].append(b)
+    indegree[b] += 1
 
-answer = []
-while heap:
-    answer.extend(heapq.heappop(heap)[1])
+def topology():
+    global indegree
+    result = []
+    q = []
 
-not_include = [i for i in range(1, N+1) if i not in answer]
-answer.extend(not_include)
-print(*answer)
+    for i in range(1, n+1):
+        if indegree[i] == 0:
+            heapq.heappush(q, i)
+    
+    while q:
+        current = heapq.heappop(q)
+        result.append(current)
+
+        for i in graph[current]:
+            indegree[i] -= 1
+
+            if indegree[i] == 0:
+                heapq.heappush(q, i)
+    
+    for i in result:
+        print(i, end=' ')
+
+topology()
