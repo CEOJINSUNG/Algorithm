@@ -1,6 +1,3 @@
-import sys
-input = sys.stdin.readline
-
 n, m, x, y = map(int, input().split())
 
 graph = [[] * (n+1) for _ in range(n+1)]
@@ -11,22 +8,35 @@ for _ in range(m):
     graph[a].append(b)
     graph[b].append(a)
 
-result = set()
+check = [[0] * 1001 for _ in range(1001)]
 
-q = [x]
-number = [0] * (n+1)
-
-while q:
-    node = q.pop(0)
+def bfs(x, y):
+    q = [(x, 1)]
+    check[x][1] = 1
+    result = set()
     
-    if number[node] < y:
-        for next in graph[node]:
-            number[next] = number[node] + 1
-            q.append(next)
-    elif number[node] == y:
-        result.add(node)
+    while q:
+        node, depth = q.pop(0)
 
-if result:
-    print(*sorted(result))
-else:
-    print(-1)
+        if depth > y:
+            break
+
+        next = graph[node]
+
+        for i in next:
+            if check[i][depth+1] == 1: continue
+            check[i][depth+1] = 1
+            q.append((i, depth+1))
+
+            if depth == y:
+                result.add(i)
+    
+    result = sorted(list(result))
+
+    if len(result) == 0:
+        print(-1)
+        return
+    
+    print(*result)
+
+bfs(x, y)
