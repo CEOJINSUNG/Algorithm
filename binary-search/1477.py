@@ -1,13 +1,11 @@
-import sys
-
-n, m, l = map(int, sys.stdin.readline().split())
-road = list(map(int, sys.stdin.readline().split()))
+n, m, l = map(int, input().split())
+road = list(map(int, input().split()))
 road.append(0)
-road.append(l-1)
+road.append(l)
 road.sort()
 
-left = 0
-right = road[-1]
+left = 1
+right = l
 answer = 0
 
 while left <= right:
@@ -16,7 +14,7 @@ while left <= right:
 
     for i in range(1, len(road)):
         if (road[i] - road[i-1]) > mid:
-            count += (road[i] - road[i-1] - 1) // mid
+            count += (road[i] - road[i-1] - 1)//mid
     
     if count > m:
         left = mid + 1
