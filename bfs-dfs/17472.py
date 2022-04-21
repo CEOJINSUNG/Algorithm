@@ -103,13 +103,10 @@ def union(x, y):
         parent[x] = y
 
 edges.sort()
-final = set()
 
 for edge in edges:
     weight, x, y = edge
     if find(x) != find(y):
-        final.add(x)
-        final.add(y)
         union(x, y)
         answer += weight
 
