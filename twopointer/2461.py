@@ -4,9 +4,10 @@ n, m = map(int, sys.stdin.readline().split())
 
 classroom = []
 for _ in range(n):
+    # 입력 받을 때 오름차순으로 정렬
     classroom.append(sorted(list(map(int, sys.stdin.readline().split()))))
 
-# position은 현재 대표 선수들의 능력치를 가져온 값
+# position의 index는 각 학급이고 숫자는 각 학급의 현재 대표 선수들의 능력치를 가져온 값
 position = [classroom[i][0] for i in range(n)]
 max_value = max(position)
 min_value = min(position)
