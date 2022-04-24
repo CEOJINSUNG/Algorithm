@@ -11,8 +11,6 @@ for _ in range(m):
 
 box.sort(key=lambda x: (x[2], -x[1]))
 
-print(box)
-
 answer = 0
 while box:
     rate, start, end, amount = box.pop(0)
