@@ -1,4 +1,4 @@
-import sys, heapq
+import sys
 
 n, c = map(int, sys.stdin.readline().split())
 m = int(sys.stdin.readline())
