@@ -1,6 +1,8 @@
 import sys
+from itertools import combinations
 
 n, m = map(int, sys.stdin.readline().split())
+answer = int(1e5)
 city = []
 house = []
 chicken = []
@@ -16,11 +18,14 @@ for y in range(n):
     
     city.append(row)
 
-for home in house:
-    min_distance = 200
-    
-    for store in chicken:
-        distance = abs(home[0] - store[0]) + abs(home[1] - store[1])
-        min_distance = min(min_distance, distance)
-    
+for store in combinations(chicken, m):
+    total = 0
+    for home in house:
+        each = 999
+        for j in range(m):
+            distance = abs(home[0] - store[j][0]) + abs(home[1] - store[j][1])
+            each = min(each, distance)
+        total += each
+    answer = min(answer, total)
 
+print(answer)
