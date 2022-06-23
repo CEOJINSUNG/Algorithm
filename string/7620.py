@@ -1,14 +1,19 @@
+# 파이썬으로 풀 수 있는 사람이 없었음 다 메모리 초과로 나옴
+
 n = input()
 m = input()
 
-dp = [[0] * (len(n) + 1) for _ in range(len(m) + 1)]
+dp = [[0] * (len(n) + 2) for _ in range(len(m) + 2)]
 
-for i in range(1, len(m) + 1):
+for i in range(len(m) + 1):
     dp[i][0] = i
+    dp[i][-1] = 2147000000
     
-for j in range(1, len(n) + 1):
+for j in range(len(n) + 1):
     dp[0][j] = j
-    
+    dp[-1][j] = 2147000000
+
+dp[-1][-1] = 2147000000
 for i in range(1, len(m) + 1):
     for j in range(1, len(n) + 1):
         if m[i-1] == n[j-1]:
@@ -21,25 +26,18 @@ for i in range(1, len(m) + 1):
 len_n = len(n)
 len_m = len(m)
 
-trace_array = []
-
-while len_n > -1 and len_m > -1:
-    index_pos = min(dp[len_m-1][len_n], dp[len_m-1][len_n-1], dp[len_m][len_n-1])
-    if index_pos == dp[len_m][len_n]:
-        trace_array.append("c " + n[len_n-1])
-        len_n -= 1
-        len_m -= 1
-    else:
-        if index_pos == dp[len_m][len_n-1]:
-            trace_array.append("d " + n[len_n-1])
-            len_n -= 1
-        elif index_pos == dp[len_m-1][len_n-1]:
-            trace_array.append("m " + m[len_m-1])
-            len_n -= 1
-            len_m -= 1
-        else:
-            trace_array.append("a " + m[len_m-1])
-            len_m -= 1
-
-for index in range(len(trace_array)-2, -1, -1):
-    print(trace_array[index])
+i, j=0, 0
+while True:
+    minimum = min(dp[i+1][j], dp[i][j+1], dp[i+1][j+1])
+    if dp[i+1][j+1] == minimum and dp[i][j] == dp[i+1][j+1]:
+        print('c', m[i])
+        i, j=i+1, j+1
+    elif minimum == dp[i+1][j+1] and i != 0:
+        print('m', m[i])
+        i, j = i+1, j+1
+    elif minimum == dp[i+1][j]:
+        print('a', m[i])
+        i, j = i+1, j
+    elif minimum == dp[i][j+1]:
+        i, j = i, j+1
+    if i == len_m and j == len_n: break
