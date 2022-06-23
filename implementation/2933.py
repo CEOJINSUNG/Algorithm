@@ -1,138 +1,110 @@
-# 동굴의 높이와 넓이 입력 받가
+from sys import stdin
+input = stdin.readline
+from collections import deque
+
+dr = (-1, 1, 0, 0)
+dc = (0, 0, -1, 1)
+
+# 미네랄 떨어질 수 있는지 칸 세기
+def checkDownCnt(fallLst, check):
+    downCnt, flag = 1, 0      # downCnt 크기 1씩 늘려가며
+    while True:
+        for r, c in fallLst:
+            if r+downCnt == R-1:        # 땅을 만나거나
+                flag = 1
+                break
+            if cave[r+downCnt+1][c] == 'x' and check[r+downCnt+1][c]:   # 다른 미네랄 만나면
+                flag = 1
+                break
+        if flag:    # 그 때가 떨어질 수 있는 최대 downCnt 값
+            break
+        downCnt += 1
+    return downCnt
+
+def checkLand():
+    check = [[0] * C for _ in range(R)]
+    # 땅에 붙어 있는 미네랄 check 배열에 표시
+    for lc in range(C):
+        if cave[R-1][lc] == "x" and not check[R-1][lc]:     # 미네랄이면서 첫 방문이면
+            check[R-1][lc] = 1
+            Q = deque([(R-1, lc)])
+            while Q:
+                r, c = Q.popleft()
+                for d in range(4):
+                    nr = r + dr[d]
+                    nc = c + dc[d]
+                    if not (0 <= nr < R and 0 <= nc < C):       # 격자 밖이면
+                        continue
+                    if cave[nr][nc] == "x" and not check[nr][nc]:   # 미네랄이거나 방문한 적 없으면
+                        check[nr][nc] = 1
+                        Q.append((nr, nc))
+    return check
+
+
+def breakMinerals(br, bc):
+	# 2단계 - 땅에 붙어 있는 미네랄 1로 표시되어 있는 맵 리턴
+    check = checkLand()
+
+	# 3단계 - 공중에 떠있는 미네랄 2로 표시, 동굴에서 지우기
+    minerals = []    # 공중에 떠있는 미네랄 리스트
+    fallLst = []     # 떨어질 수 있는 클러스터의 아랫부분만 저장
+    for nd in range(4):     # 깨진 곳 기준으로 4방향 확인
+        r = br + dr[nd]
+        c = bc + dc[nd]
+        if not (0 <= r < R and 0 <= c < C):
+            continue
+
+        # 미네랄인데 땅에 붙어 있지 않다면(check 배열에서 0으로 표시되어 있다면) 2로 표시
+        if cave[r][c] == "x" and not check[r][c]:
+            Q = deque([(r, c)])
+            check[r][c] = 2
+            minerals.append((r, c))
+            cave[r][c] = "."
+            while Q:
+                r, c = Q.popleft()
+                if cave[r+1][c] == ".":     # 바로 밑이 빈 공간인 미네랄
+                    fallLst.append((r, c))
+                for d in range(4):
+                    nr = r + dr[d]
+                    nc = c + dc[d]
+                    if not (0 <= nr < R and 0 <= nc < C):
+                        continue
+                    if cave[nr][nc] == "x" and not check[nr][nc]:
+                        check[nr][nc] = 2           # 공중에 떠있는 미네랄 클러스터 표시
+                        Q.append((nr, nc))
+                        minerals.append((nr, nc))   # 미네랄 위치 리스트에 담기
+                        cave[nr][nc] = "."          # 동굴에서 공중에 떠 있는 미네랄 제거
+
+    if fallLst:    # 공중에 떠있는 미네랄이 있다면
+    	# 4단계 - 떨어질 최대 칸의 수 리턴
+        downCnt = checkDownCnt(fallLst, check)
+
+        # 5단계 - 미네랄 떨어질 위치 동굴에 그리기
+        for mr, mc in minerals:
+            cave[mr+downCnt][mc] = "x"
+
+# main
 R, C = map(int, input().split())
-
-# 동굴의 크기 선언 및 미네랄 입력받기
-cave = [[] for _ in range(R)]
-for i in range(R):
-    C_list = input()
-    cave[i].extend(list(C_list))
-
-# 막대를 던진 횟수
+cave = [list(input().rstrip()) for _ in range(R)]
 N = int(input())
+heights = list(map(int, input().split()))
 
-# 막대를 던진 위치
-throw_stick = list(map(int, input().split()))
-
-# 미네랄 위치를 찾아 변환하는 함수
-def find_mineral(height, direction):
-    mineral_position = [index for index, value in enumerate(cave[height]) if value == "x"]
-
-    # 미네랄이 있다면
-    if len(mineral_position) != 0:
-        # 방향이 왼쪽이라면
-        if direction%2 == 0:
-            cave[height][mineral_position[0]] = "."
-            del mineral_position[0]
-            return find_below(mineral_position, height)
-        # 방향이 오른쪽이라면
-        else:
-            cave[height][mineral_position[-1]] = "."
-            del mineral_position[-1]
-            return find_below(mineral_position, height)
-    
-    # 미네랄이 없다면
-    return find_below(mineral_position, height)
-
-# 가장 아래쪽에 있는 미네랄을 찾기
-def find_below(mineral_position, height_over):
-    # 미네랄이 없다면
-    if not mineral_position:
-        if height_over != 0:
-            # 더 높은 곳부터살펴봄
-            for i in reversed(range(height_over)):
-                below_mineral = [index for index, value in enumerate(cave[i]) if value == "x"]
-
-                # 만약 x가 위에서 발견했다면 그거를 가지고 옴
-                if below_mineral:
-                    minmum_below = []
-                    # 발견한 x마다 아래로 갔을 때 발견한 바닥 및 미네랄과의 높이를 구함
-                    for j in below_mineral:
-                        for k in range(i+1, R):
-                            # 바닥
-                            if k == R-1:
-                                minmum_below.append([j, R-1-i])
-                                break
-                            # 미네랄
-                            elif cave[k][j] == "x":
-                                minmum_below.append([j, k-i-1])
-                                break
-                    # 발견한 x의 [column 위치, [row위치, 아래로 가야하는 길이]]
-                    return [i, minmum_below]
-            return []
-        else:
-            return []
-    # 막대로 제거 이후에 같은 줄에 미네랄이 있다면
-    else:
-        minmum_below = []
-        for j in mineral_position:
-            # 발견한 x마다 아래로 갔을 때 발견한 바닥 및 미네랄과의 높이를 구함
-            for k in range(height+1, R):
-                # 바닥
-                if k == R-1 and cave[k][j] == '.':
-                    minmum_below.append([j, R-1-height])
-                    break
-                # 미네랄
-                elif cave[k][j] == "x":
-                    minmum_below.append([j, k-height])
-                    break
-        # 발견한 x의 [column 위치, [row위치, 아래로 가야하는 길이]]를 받음
-        return [height_over, minmum_below]
-
-# bfs 선언
-def bfs(x, y):
-    # 상하좌우에 필요한 좌표
-    dx = [0, 0, 1, -1]
-    dy = [-1, 1, 0, 0]
-
-    # 방문한 위치
-    visited = []
-
-    # 큐 선언
-    q = []
-
-    # 초기 좌표 삽입
-    visited = [[x, y]]
-
-    # column == R-1인 경우 찾기
-    connected = False
-    q.append((x, y))
-
-    while q:
-        x_, y_ = q.pop(0)
-
-        for i in range(4):
-            new_x_ = x_ + dx[i]
-            new_y_ = y_ + dy[i]
-            if 0 <= new_x_ < C and 0 <= new_y_ < R and cave[new_y_][new_x_] == "x" and [new_x_, new_y_] not in visited:
-                visited.append([new_x_, new_y_])
-                q.append((new_x_, new_y_))
-                if new_y_ == R - 1:
-                    connected = True
-    if connected:
-        return []
-    else:
-        return visited
-
-
+# 1단계 - 좌우에서 막대기 던져 미네랄 깨기
 for i in range(N):
-    height = R-throw_stick[i]
-    mineral = find_mineral(height, i)
-
-    # 발견한 x의 위치마다 BFS를 수행해서 column == R-1인 경우가 있다면 아래로 연결되어 있다는 의미이고 
-    # 없다면 고립되어 있는 것이므로 가장 낮은 거리를 가진 요소를 기준으로 아래로 내림
-    if mineral:
-        y = mineral[0]
-        for j in mineral[1]:
-            visit_result = bfs(j[0], y)
-            # 만약 고립되어 있다면
-            if visit_result:
-                for position in visit_result:
-                    x = position[0]
-                    old_y = position[1]
-                    new_y = position[1] + j[1]
-                    cave[old_y][x] = "."
-                    cave[new_y][x] = "x"
-                
-
-for a in cave:
-    print(''.join(a))
+    br = R - heights[i]
+    if not i % 2:       # 왼쪽에서 깸
+        for bc in range(C):
+            if cave[br][bc] == "x":
+                cave[br][bc] = "."
+                breakMinerals(br, bc)   # 깨진 위치 인자로 넘겨 미네랄 깨기
+                break
+    else:               # 오른쪽에서 깸
+        for bc in range(C-1, -1, -1):
+            if cave[br][bc] == "x":
+                cave[br][bc] = "."
+                breakMinerals(br, bc)
+                break
+    
+# 형식에 맞게 출력
+for row in cave:
+    print(''.join(row))
