@@ -3,14 +3,14 @@ n, x = map(int, input().split())
 if (n-1)*(n-2) < 2*x:
     print(-1)
 else:
-    visited = [True]*(n+2)
+    visited = [True]*(n+1)
     visited[n] = True
     visited[n-1] = True
 
     print(n, end=" ")
 
     mid = x
-    temp = 1
+    temp = 0
     while mid >= 0:
         if (mid >= n - 1 - temp):
             print(temp, end=" ")
@@ -22,6 +22,6 @@ else:
             visited[n - 1 - mid] = True
             break
     print(n-1, end=" ")
-    # for i in range(n, 0, -1):
-    #     if not visited[i]:
-    #         print(i, end=" ")
+    for i in range(n, 0, -1):
+        if not visited[i]:
+            print(i, end=" ")
