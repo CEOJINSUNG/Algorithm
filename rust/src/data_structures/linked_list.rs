@@ -42,4 +42,166 @@ impl<T> LinkedList<T> {
             Some(head_ptr) => unsafe { (*head_ptr.as_ptr()).prev = node_ptr }
         }
     }
+
+    pub fn insert_at_tail(&mut self, obj: T) {
+        let mut node = Box::new(Node::new(obj));
+        node.next = None;
+        node.prev = self.tail;
+        
+        let node_ptr = Some(unsafe { NonNull::new_unchecked(Box::into_raw(node)) });
+        match self.tail {
+            None => self.head = node_ptr,
+            Some(tail_ptr) => unsafe {(*tail_ptr.as_ptr()).next = node_ptr},
+        }
+
+        self.tail = node_ptr;
+        self.length += 1;
+    }
+
+    pub fn insert_at_ith(&mut self, index: u32, obj: T) {
+        if self.length < index {
+            panic!("Index out of bounds");
+        }
+
+        if index == 0 || self.head.is_none() {
+            self.insert_at_head(obj);
+            return;
+        }
+
+        if self.length == index {
+            self.insert_at_tail(obj);
+            return;
+        }
+
+        if let Some(mut ith_node) = self.head {
+            for _ in 0..index {
+                unsafe {
+                    match (*ith_node.as_ptr()).next {
+                        None => panic!("Index out of bounds"),
+                        Some(next_ptr) => ith_node = next_ptr,
+                    }
+                }
+            }
+
+            let mut node = Box::new(Node::new(obj));
+            unsafe {
+                node.prev = (*ith_node.as_ptr()).prev;
+                node.next = Some(ith_node);
+
+                if let Some(p) = (*ith_node.as_ptr()).prev {
+                    let node_ptr = Some(NonNull::new_unchecked(Box::into_raw(node)));
+                    println!("{:?}", (*p.as_ptr()).next);
+                    (*p.as_ptr()).next = node_ptr;
+                    (*ith_node.as_ptr()).prev = node_ptr;
+                    self.length += 1;
+                }
+            }
+        }
+    }
+
+    pub fn delete_head(&mut self) -> Option<T> {
+        self.head.map(|head_ptr| unsafe {
+            let old_head = Box::from_raw(head_ptr.as_ptr());
+            match old_head.next {
+                Some(mut next_ptr) => next_ptr.as_mut().prev = None,
+                None => self.tail = None,
+            }
+            self.head = old_head.next;
+            self.length -= 1;
+            old_head.val
+        })
+    }
+
+    pub fn delete_tail(&mut self) -> Option<T> {
+        self.tail.map(|tail_ptr| unsafe {
+            let old_tail = Box::from_raw(tail_ptr.as_ptr());
+            match old_tail.prev {
+                Some(mut prev) => prev.as_mut().next = None,
+                None => self.head = None,
+            }
+            self.tail = old_tail.prev;
+            self.length -= 1;
+            old_tail.val
+        })
+    }
+
+    pub fn delete_ith(&mut self, index: u32) -> Option<T> {
+        if self.length < index {
+            panic!("Index out of bounds");
+        }
+
+        if index == 0 || self.head.is_none() {
+            return self.delete_head();
+        }
+
+        if self.length == index {
+            return self.delete_tail();
+        }
+
+        if let Some(mut ith_node) = self.head {
+            for _ in 0..index {
+                unsafe {
+                    match (*ith_node.as_ptr()).next {
+                        None => panic!("Index out of bounds"),
+                        Some(next_ptr) => ith_node = next_ptr,
+                    }
+                }
+            }
+
+            unsafe {
+                let old_ith = Box::from_raw(ith_node.as_ptr());
+
+                if let Some(mut prev) = old_ith.prev {
+                    prev.as_mut().next = old_ith.next;
+                }
+
+                if let Some(mut next) = old_ith.next {
+                    next.as_mut().prev = old_ith.prev;
+                }
+
+                self.length -= 1;
+                Some(old_ith.val)
+            }
+        } else {
+            None
+        }
+    }
+
+    pub fn get(&mut self, index: i32) -> Option<&'static T> {
+        Self::get_ith_node(self.head, index)
+    }
+
+    fn get_ith_node(node: Option<NonNull<Node<T>>>, index: i32) -> Option<&'static T> {
+        match node {
+            None => None,
+            Some(next_ptr) => match index {
+                0 => Some(unsafe { &(*next_ptr.as_ptr()).val }),
+                _ => Self::get_ith_node(unsafe { (*next_ptr.as_ptr()).next }, index - 1),
+            }
+        }
+    }
+}
+
+impl<T> Drop for LinkedList<T> {
+    fn drop(&mut self) {
+        while self.delete_head().is_some() {}
+    }
+}
+
+impl<T> Display for LinkedList<T> where T: Display, {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        match self.head {
+            Some(node) => write!(f, "{}", unsafe { node.as_ref() }),
+            None => Ok(()),
+        }
+    }
+}
+
+impl<T> Display for Node<T> where T: Display, {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        match self.next {
+            Some(node) => write!(f, "{}", "{}", self.val, unsafe { node.as_ref() }),
+            None => write!(f, "{}", self.val),
+        }
+    }
 }
