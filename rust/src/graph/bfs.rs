@@ -44,3 +44,29 @@ impl From<(u32, u32)> for Edge {
         Edge(item.0, item.1)
     }
 }
+
+pub fn bfs(graph: &Graph, root: Node, target: Node) -> Option<Vec<u32>> {
+    let mut visited: HashSet<Node> = HashSet::new();
+    let mut history: Vec<u32> = Vec::new();
+    let mut queue = VecDeque::new();
+
+    visited.insert(root);
+    queue.push_back(root);
+    
+    while let Some(current_node) = queue.pop_front() {
+        history.push(current_node.value());
+
+        if current_node == target {
+            return Some(history);
+        }
+
+        for neighbor in current_node.neighbors(graph) {
+            if !visited.contains(&neighbor) {
+                visited.insert(neighbor);
+                queue.push_back(neighbor);
+            }
+        }
+    }
+
+    None
+}
