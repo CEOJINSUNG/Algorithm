@@ -1,24 +1,26 @@
-N, M = map(int, input().split())
-t = list(map(int, input().split()))
+n, m = map(int, input().split())
+times = list(map(int, input().split()))
 
-l = 1
-r = 10**20
-max_m = max_s = 0
+if n <= m:
+    print(n)
+    exit()
+left, right = 1, 10**20 * 30
+standard = 0
 
-while l <= r:
-    mid = (l+r)//2
-    s = sum((mid-1)//x + 1 for x in t)
-    if s < N:
-        if max_m < mid:
-            max_m = mid
-            max_s = s
-        l = mid + 1
+while left <= right:
+    mid = (left + right) // 2
+    total = m + sum([mid // time for time in times])
+    if total < n:
+        left = mid + 1
     else:
-        r = mid - 1
+        standard = mid
+        right = mid - 1
 
-for i, k in enumerate(t):
-    if max_m % k == 0:
-        max_s += 1
-        if max_s == N:
-            print(i+1)
-            break
+cur = m + sum([(standard - 1) // time for time in times])
+
+for i, time in enumerate(times):
+    if standard % time == 0:
+        cur += 1
+    if cur == n:
+        print(i+1)
+        break
