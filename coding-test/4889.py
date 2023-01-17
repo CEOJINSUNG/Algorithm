@@ -27,13 +27,7 @@ while True:
             element.pop()
             count += 1
         else:
-            if len(element) > 0 and char == "}" and element[-1] == "{":
-                element.pop()
-            else:
-                element.append(char)
+            element.append(char)
     
-    if len(element) == 0:
-        print('{0}. {1}'.format(number, count))
-    else:
-        print('{0}. {1}'.format(number, count + len(element)))
+    print('{0}. {1}'.format(number, count + len(element)))
     
